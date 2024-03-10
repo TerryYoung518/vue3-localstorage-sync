@@ -1,0 +1,1 @@
+export { LocalstorageManager, bind, removeStorageListener } from './WatchStorage'
