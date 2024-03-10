@@ -1,8 +1,14 @@
-# vue3-localstorage-sync
+# vue3-localstorage-sync [![npm](https://img.shields.io/npm/v/vue3-localstorage-sync.svg)](https://www.npmjs.com/package/vue3-localstorage-sync)
 
 English|[中文](./README.zh.md)
 
 This project is based on Vue3's `watch` method and browser's native `localStorage`, achieving data synchronization between same-origin pages by listening to the `storage` event of the `window` object.
+
+## Installation
+
+```bash
+npm i vue3-localstorage-sync
+```
 
 ## Usage
 
