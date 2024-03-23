@@ -52,7 +52,8 @@ export function bind<T extends object>(target: T, fieldKey: string): T {
     }, fieldKey);
 
     manager.bindLoad(() => {
-      let newValue = JSON.parse(localStorage.getItem(fieldKey) ?? "{}");
+      if (localStorage.getItem(fieldKey) === null) return;
+      let newValue = JSON.parse(localStorage.getItem(fieldKey)!);
       (target as Ref).value = newValue;
     }, fieldKey);
   } else {
@@ -61,7 +62,8 @@ export function bind<T extends object>(target: T, fieldKey: string): T {
     }, fieldKey);
 
     manager.bindLoad(() => {
-      let newTarget = JSON.parse(localStorage.getItem(fieldKey) ?? "{}");
+      if (localStorage.getItem(fieldKey) === null) return;
+      let newTarget = JSON.parse(localStorage.getItem(fieldKey)!);
       for (const key in newTarget) {
         (target as any)[key] = (newTarget as any)[key];
       }
