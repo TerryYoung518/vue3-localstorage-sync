@@ -1,6 +1,6 @@
 {
   "name": "vue3-localstorage-sync",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A simple utility package that synchronizes reactive data between localStorage and different pages in a Vue 3 application.",
   "author": "TerryYoung518",
   "license": "MIT",
