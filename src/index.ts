@@ -1,1 +1,1 @@
-export { LocalstorageManager, bind, removeStorageListener } from './WatchStorage'
+export { useBind } from './WatchStorage'

@@ -1,80 +1,34 @@
-import { Ref, isRef, watch } from "vue";
+import { Ref, UnwrapNestedRefs, UnwrapRef, WatchSource, isRef, onMounted, onUnmounted, watch } from "vue";
 
-export class LocalstorageManager {
-  private static instance: LocalstorageManager;
-
-  private readonly saves: Record<string, Function> = {};
-  private readonly loads: Record<string, Function> = {};
-
-  private constructor() {
-    window.addEventListener("storage", this.handleStorageEvent);
-  }
-
-  public static getInstance(): LocalstorageManager {
-    if (!LocalstorageManager.instance) {
-      LocalstorageManager.instance = new LocalstorageManager();
-    }
-    return LocalstorageManager.instance;
-  }
-
-  private handleStorageEvent = (e: Event) => {
-    const fieldKey = (e as StorageEvent).key ?? "";
-    this.loads[fieldKey]?.();
-  };
-
-  public save(fieldKey: string) {
-    this.saves[fieldKey]?.();
-  }
-
-  public load(fieldKey: string) {
-    this.loads[fieldKey]?.();
-  }
-
-  public bindSave(callback: () => void, fieldKey: string): void {
-    this.saves[fieldKey] = this.saves[fieldKey] || callback;
-  }
-
-  public bindLoad(callback: () => void, fieldKey: string): void {
-    this.loads[fieldKey] = this.loads[fieldKey] || callback;
-  }
-
-  public close(): void {
-    window.removeEventListener("storage", this.handleStorageEvent);
-  }
-}
-
-export function bind<T extends object>(target: T, fieldKey: string): T {
-  const manager = LocalstorageManager.getInstance();
+export function useBind<T>(target: UnwrapNestedRefs<T> | Ref<UnwrapRef<T>>, fieldKey: string): UnwrapNestedRefs<T> | Ref<UnwrapRef<T>> {
+  let loadFunc: () => void;
 
   if (isRef(target)) {
-    manager.bindSave(() => {
-      localStorage.setItem(fieldKey, JSON.stringify((target as Ref).value));
-    }, fieldKey);
-
-    manager.bindLoad(() => {
+    loadFunc = () => {
       if (localStorage.getItem(fieldKey) === null) return;
       let newValue = JSON.parse(localStorage.getItem(fieldKey)!);
       (target as Ref).value = newValue;
-    }, fieldKey);
+    };
   } else {
-    manager.bindSave(() => {
-      localStorage.setItem(fieldKey, JSON.stringify(target));
-    }, fieldKey);
-
-    manager.bindLoad(() => {
+    loadFunc = () => {
       if (localStorage.getItem(fieldKey) === null) return;
       let newTarget = JSON.parse(localStorage.getItem(fieldKey)!);
       for (const key in newTarget) {
         (target as any)[key] = (newTarget as any)[key];
       }
-    }, fieldKey);
+    };
   }
 
+  const handleStorageEvent = (e: Event) => {
+    const _fieldKey = (e as StorageEvent).key;
+    if(fieldKey === _fieldKey) loadFunc();
+  };
+
   watch(
-    target,
+    target as WatchSource<T>,
     (value, oldValue) => {
       if (oldValue === undefined) {
-        manager.load(fieldKey);
+        loadFunc();
       } else {
         localStorage.setItem(fieldKey, JSON.stringify(value));
       }
@@ -85,10 +39,13 @@ export function bind<T extends object>(target: T, fieldKey: string): T {
     }
   );
 
-  return target;
-}
+  onMounted(() => {
+    window.addEventListener("storage", handleStorageEvent);
+  })
 
-export function removeStorageListener(): void {
-  const manager = LocalstorageManager.getInstance();
-  manager.close();
+  onUnmounted(() => {
+    window.removeEventListener("storage", handleStorageEvent);
+  })
+
+  return target;
 }

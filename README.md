@@ -12,27 +12,19 @@ npm i vue3-localstorage-sync
 
 ## Usage
 
-Import `bind` and `removeStorageListener` methods from `vue3-localstorage-sync`:
+Import `useBind` method from `vue3-localstorage-sync`:
 
 ```typescript
-import { bind, removeStorageListener } from 'vue3-localstorage-sync'
+import { useBind } from 'vue3-localstorage-sync'
 ```
 
-Create a `ref` or `reactive` object and pass in a unique key as the binding basis. Optionally, use the returned proxy object. The data will be stored in the browser's `localStorage` under the provided key.
+Create a `ref` or `reactive` object and pass in a unique key as the binding basis. Optionally, use the returned reactive object. The data will be stored in the browser's `localStorage` under the provided key.
 
 ```typescript
 // Method 1
-const count = bind(ref(0), 'count');
+const count = useBind(ref(0), 'count');
 
 // Method 2
 const count = ref(0);
-bind(count, 'count')
-```
-
-Call `removeStorageListener()` in the `onBeforeUnmount` lifecycle hook of Vue3 to clean up resources.
-
-```typescript
-onBeforeUnmount(() => {
-  removeStorageListener()
-})
+useBind(count, 'count')
 ```

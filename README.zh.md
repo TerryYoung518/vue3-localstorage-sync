@@ -13,27 +13,19 @@ npm i vue3-localstorage-sync
 
 ## 使用方法
 
-从`vue3-localstorage-sync`中引入`bind`与`removeStorageListener`方法：
+从`vue3-localstorage-sync`中引入`useBind`方法：
 
 ```typescript
-import { bind, removeStorageListener } from 'vue3-localstorage-sync'
+import { useBind } from 'vue3-localstorage-sync'
 ```
 
 创建一个`ref`或`reactive`对象，并传入一个唯一的键名作为绑定依据，你也可以选择使用返回的代理对象。有效数据将被存储在浏览器的`localStorage`中，对应传入的键名。
 
 ```typescript
 // 方法 1
-const count = bind(ref(0), 'count');
+const count = useBind(ref(0), 'count');
 
 // 方法 2
 const count = ref(0);
-bind(count, 'count')
+useBind(count, 'count')
 ```
-
-在Vue3的`onBeforeUnmount`生命周期钩子中调用`removeStorageListener()`来清理资源。
-
-```typescript
-onBeforeUnmount(() => {
-  removeStorageListener()
-})
-``` 
